@@ -32,6 +32,8 @@ const view = {
     clearBoard() {
         blocks.forEach(block => {
             const mole = block.querySelector('.mole');
+            const snake = block.querySelector('.snake');
+            if (snake) block.removeChild(snake);
             if (mole) block.removeChild(mole);
         });
     },
@@ -42,12 +44,21 @@ const view = {
         mole.classList.add('mole');
         block.appendChild(mole);
         return mole;
+    },
+
+    showSnake(block) {
+        const snake = document.createElement('img');
+        snake.src = 'images/snake.jpg';
+        snake.classList.add('snake');
+        block.appendChild(snake);
+        return snake;
     }
 };
 
 const controller = {
     gameInterval: null,
     moleInterval: null,
+    snakeInterval: null,
 
     getRandomEmptyBlock() {
         const emptyBlocks = [...blocks].filter(block => !block.querySelector('.mole'));
@@ -79,6 +90,28 @@ const controller = {
         }, 2000);
     },
 
+    spawnSnake() {
+        blocks.forEach(block => {
+            const snake = block.querySelector('.snake');
+            if (snake) {
+                block.removeChild(snake);
+            };
+        });
+        const randIndex = Math.floor(Math.random() * blocks.length);
+        const block = blocks[randIndex];
+        const snake = view.showSnake(block);
+        snake.addEventListener('click', () => {
+            clearInterval(this.moleInterval);
+            clearInterval(this.gameInterval);
+            clearInterval(this.snakeInterval);
+            blocks.forEach(block => {
+                if (!block.querySelector('.snake')) {
+                    view.showSnake(block);
+                };
+            });
+        });    
+    },
+
     startGame() {
         model.GameState.reset();
         view.renderScore(model.GameState.score);
@@ -91,6 +124,7 @@ const controller = {
             if (model.GameState.timeLeft <= 0) {
                 clearInterval(this.gameInterval);
                 clearInterval(this.moleInterval);
+                clearInterval(this.snakeInterval);
                 alert('Time is Up !!!');
                 view.clearBoard();
             }
@@ -99,6 +133,10 @@ const controller = {
         this.moleInterval = setInterval(() => {
             controller.spawnMole();
         }, 1000);
+
+        this.snakeInterval = setInterval(() => {
+            controller.spawnSnake();
+        }, 2000);
     }
 };
 

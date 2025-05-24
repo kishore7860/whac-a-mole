@@ -52,3 +52,9 @@ p {
   height: 100%;
   object-fit: cover;
 }
+
+.snake {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
